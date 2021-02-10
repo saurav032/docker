@@ -1,24 +1,26 @@
 # to change permission
 
-- sudo chmod 777 /var/run/docker.sock
+sudo chmod 777 /var/run/docker.sock
 
 # sample docker file
 
-- # Dockerfile
+# Dockerfile
 
-  FROM node:14
+FROM node:14
 
-  WORKDIR /app
+WORKDIR /app
 
-  COPY package.json .
+COPY package.json .
 
-  RUN npm install
+RUN npm install
 
-  COPY . .
+COPY . .
 
-  EXPOSE 3000
+EXPOSE 3000
 
-  CMD ["node", "server.js"]
+VOLUME ["/app/node_modules"]
+
+CMD ["node", "server.js"]
 
 # to Build image
 
@@ -72,7 +74,7 @@
 
 # to remove a conatiner automatically
 
-docker run -p 8000:80 -d --rm image_name
+docker run -p 8000:3000 -d --rm image_name
 
 # to inspect an image
 
@@ -123,3 +125,29 @@ docker run -p 8000:80 -d --rm image_name
 # to pull an image from docker hub
 
     docker pull saurav032/firstimage
+
+# to run a container with named volumes
+
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data myimage:latest
+
+# volume list
+
+    docker volume ls
+
+# remove volume
+
+    docker volume rm VOL_NAME
+    docker volume prune
+
+# bind mounts (run time edit the code)
+
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" myimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v $(pwd):/app -v /app/node_modules myimage:latest
+
+# read only volumes
+
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app:ro" -v /app/temp myimage:latest
+
+# logs
+
+    docker logs myapp
