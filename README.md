@@ -18,8 +18,6 @@ COPY . .
 
 EXPOSE 3000
 
-VOLUME ["/app/node_modules"]
-
 CMD ["node", "server.js"]
 
 # to Build image
@@ -126,6 +124,24 @@ docker run -p 8000:3000 -d --rm image_name
 
     docker pull saurav032/firstimage
 
+# to run a conatiner with annonymous voluemes
+
+    FROM node:14
+
+    WORKDIR /app
+
+    COPY package.json .
+
+    RUN npm install
+
+    COPY . .
+
+    EXPOSE 3000
+
+    VOLUME ["/app/node_modules"]
+
+    CMD ["node", "server.js"]
+
 # to run a container with named volumes
 
     docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data myimage:latest
@@ -134,14 +150,18 @@ docker run -p 8000:3000 -d --rm image_name
 
     docker volume ls
 
+# inspect docker volume
+
+    docker volume inspect vol_name
+
 # remove volume
 
-    docker volume rm VOL_NAME
+    docker volume rm vol_name
     docker volume prune
 
 # bind mounts (run time edit the code)
 
-    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" myimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
     docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v $(pwd):/app -v /app/node_modules myimage:latest
 
 # read only volumes
@@ -151,3 +171,63 @@ docker run -p 8000:3000 -d --rm image_name
 # logs
 
     docker logs myapp
+
+# .dockerignore file
+
+    node_modules
+    Dockerfile
+    .git
+
+# argument & env variables
+
+    FROM node:14
+
+    WORKDIR /app
+
+    COPY package.json .
+
+    RUN npm install
+
+    COPY . .
+
+    ENV PORT 3000
+
+    EXPOSE $PORT
+
+    VOLUME ["/app/node_modules"]
+
+    CMD ["node", "server.js"]
+
+    =====================
+
+    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+
+    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+
+    docker run -d -p 8000:5000 --env-fle ./.env --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+
+    =====================
+
+    FROM node:14
+
+    ARG DEFAULT_PORT=3000
+
+    WORKDIR /app
+
+    COPY package.json .
+
+    RUN npm install
+
+    COPY . .
+
+    ENV PORT $DEFAULT_PORT
+
+    EXPOSE $PORT
+
+    VOLUME ["/app/node_modules"]
+
+    CMD ["node", "server.js"]
+
+    =======================
+
+    docker build -t myimage:latest --build-arg DEFAULT_PORT=5000
