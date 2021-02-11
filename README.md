@@ -90,19 +90,19 @@ docker run -p 8000:3000 -d --rm image_name
 
     docker run -p 8000:3000 -d --rm --name myapp image_name
 
-# naming and tagging a image (name -> myimage, tag -> latest)
+# naming and tagging a image (name -> myappimage, tag -> latest)
 
-    docker build -t myimage:latest .
+    docker build -t myappimage:latest .
 
-    docker build -t myimage:1 .
+    docker build -t myappimage:1 .
 
 # naming a container (myapp)
 
-    docker run -p 8000:3000 -d --rm --name myapp myimage:latest
+    docker run -p 8000:3000 -d --rm --name myapp myappimage:latest
 
 # to rename an image
 
-    docker tag myimage:latest saurav032/firstimage:latest
+    docker tag myappimage:latest saurav032/firstimage:latest
 
 # to build an image with name
 
@@ -144,7 +144,7 @@ docker run -p 8000:3000 -d --rm image_name
 
 # to run a container with named volumes
 
-    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data myimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data myappimage:latest
 
 # volume list
 
@@ -161,12 +161,12 @@ docker run -p 8000:3000 -d --rm image_name
 
 # bind mounts (run time edit the code)
 
-    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
-    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v $(pwd):/app -v /app/node_modules myimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myappimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v $(pwd):/app -v /app/node_modules myappimage:latest
 
 # read only volumes
 
-    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app:ro" -v /app/temp myimage:latest
+    docker run -d -p 8000:3000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app:ro" -v /app/temp myappimage:latest
 
 # logs
 
@@ -200,11 +200,11 @@ docker run -p 8000:3000 -d --rm image_name
 
     =====================
 
-    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myappimage:latest
 
-    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+    docker run -d -p 8000:5000 --env PORT=5000 --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myappimage:latest
 
-    docker run -d -p 8000:5000 --env-fle ./.env --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myimage:latest
+    docker run -d -p 8000:5000 --env-fle ./.env --rm --name myapp -v data:/app/data -v "/home/saurav/docker/p1:/app" -v /app/node_modules myappimage:latest
 
     =====================
 
@@ -230,7 +230,7 @@ docker run -p 8000:3000 -d --rm image_name
 
     =======================
 
-    docker build -t myimage:latest --build-arg DEFAULT_PORT=5000
+    docker build -t myappimage:latest --build-arg DEFAULT_PORT=5000
 
 # to connect to host database
 
@@ -254,4 +254,18 @@ docker run -p 8000:3000 -d --rm image_name
 
 # to run docker image in a network
 
-    docker run --name myapp --network mynetwork -d --rm -p 8000:3000 myimage
+    docker run --name myapp --network mynetwork -d --rm -p 8000:3000 myappimage
+
+# to start a react app in dev mode
+
+    docker run --name my-frontend-app --rm -p 3000:3000 -i myappimage
+
+# to run mongodb with named volume to persiste data
+
+    docker run --name mongodb -v data:/data/db --rm -d --network mynetwork mongo
+
+# to run mongodb with username, passowrd and named volume to persiste data
+
+    docker run --name mongodb -v data:/data/db --rm -d --network mynetwork --env MONGO_ININTBD_ROOT_USERNAME=saurav --env MONGO_INITDB_ROOT_PASSWORD=secret mongo
+
+    "momgodb://saurav:secret@mongodb:27017/mydb?authSource=admin"
