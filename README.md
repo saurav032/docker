@@ -505,7 +505,7 @@ docker run -it -v /home/saurav/myapp:/app mynpm init
 
 docker run -it -v /home/saurav/myapp:/app mynpm install --save express
 
-#docker-compose.yaml file for util
+# docker-compose.yaml file for util
 
 ```
 version: "3.8"
@@ -519,3 +519,280 @@ services:
 ```
 
 docker-compose run --rm npm init
+
+# docker-compose.yaml file for nginx
+
+```
+version: "3.8"
+
+services:
+  server:
+    image: 'nginx:stable-alpine'
+    ports:
+      - '8000:80'
+     volumes
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+```
+
+# nginx.conf
+
+```
+server {
+    listen 80;
+    index index.php index.html;
+    server_name localhost;
+    root /var/www/html/public;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+
+```
+
+# php dockerfile
+
+```
+FROM php:7.4-fpm-alpine
+
+WORKDIR /var/www/html
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+```
+
+# docker-compose file for php
+
+```
+version "3.8"
+services:
+  php:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+
+```
+
+# docker-compose file for mysql
+
+```
+version: "3.8"
+services:
+  mysql:
+    image: mysql:5.7
+    env_file:
+      - ./env/mysql.env
+```
+
+# mysql.env file
+
+```
+MYSQL__DATABASE=mydb
+MYSQL_USER=root
+MYSQL_PASSWORD=root
+MYSQL_ROOT_PASSWORD=secret
+```
+
+# docker-compose file for composer
+
+```
+version: "3.8"
+services:
+  composer:
+    build:
+       context: ./dockerfiles
+       dockerfile: composer.dockerfile
+    volumes:
+		  - ./src:/var/www/html
+```
+
+# composer.dockerfile
+
+```
+FROM composer:latest
+
+WORKDIR /var/www/html
+
+ENTRYPOINT ["composer", "--ignore-platform-reqs"]
+```
+
+# setting laravel project
+
+    docker-compose run --rm composer create-project --prefer-dist laravel/laravel .
+
+# php.dockerfile
+
+```
+FROM php:7.4-fpm-alpine
+
+WORKDIR /var/www/html
+
+COPY src .
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
+
+USER laravel
+```
+
+# composer.dockerfile
+
+```
+FROM composer:latest
+
+RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
+
+USER laravel
+
+WORKDIR /var/www/html
+
+ENTRYPOINT [ "composer", "--ignore-platform-reqs" ]
+
+```
+
+# start laravel app
+
+docker-compose up -d --build server mysql php
+
+# nginx docker file
+
+```
+FROM nginx:stable-alpine
+
+WORKDIR /etc/nginx/conf.d
+
+COPY nginx/nginx.conf .
+
+RUN mv nginx.conf default.conf
+
+WORKDIR /var/www/html
+
+COPY src .
+```
+
+# composer docker file
+
+```
+FROM composer:latest
+
+RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
+
+USER laravel
+
+WORKDIR /var/www/html
+
+ENTRYPOINT [ "composer", "--ignore-platform-reqs" ]
+```
+
+# php docker file
+
+```
+FROM php:7.4-fpm-alpine
+
+WORKDIR /var/www/html
+
+COPY src .
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+RUN addgroup -g 1000 laravel && adduser -G laravel -g laravel -s /bin/sh -D laravel
+
+USER laravel
+
+# RUN chown -R laravel:laravel .
+```
+
+# nginx.conf file
+
+```
+server {
+    listen 80;
+    index index.php index.html;
+    server_name localhost;
+    root /var/www/html/public;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+```
+
+# mysql.env
+
+```
+MYSQL_DATABASE=homestead
+MYSQL_USER=homestead
+MYSQL_PASSWORD=secret
+MYSQL_ROOT_PASSWORD=secret
+```
+
+# docker-compose.yaml
+
+```
+version: '3.8'
+
+services:
+  server:
+    # image: 'nginx:stable-alpine'
+    build:
+      context: .
+      dockerfile: dockerfiles/nginx.dockerfile
+    ports:
+      - '8000:80'
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+      - mysql
+  php:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+  mysql:
+    image: mysql:5.7
+    env_file:
+      - ./env/mysql.env
+  composer:
+    build:
+      context: ./dockerfiles
+      dockerfile: composer.dockerfile
+    volumes:
+      - ./src:/var/www/html
+  artisan:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ['php', '/var/www/html/artisan']
+  npm:
+    image: node:14
+    working_dir: /var/www/html
+    entrypoint: ['npm']
+    volumes:
+      - ./src:/var/www/html
+```
