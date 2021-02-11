@@ -469,3 +469,53 @@ volumes:
   logs:
 
 ```
+
+# docker util
+
+docker run -it -d node
+
+docker exec -it conatiner_name npm init
+
+docker run -it node npm init
+
+# util image
+
+```
+FROM node:14-alpine
+
+WORKDIR /app
+```
+
+# using docker util
+
+docker run -it -v /home/saurav/myapp/app:/app node-util npm init
+
+# util image mynpm
+
+```
+FROM node:14-alpine
+
+WORKDIR /app
+
+ENTRYPOINT ["npm"]
+
+```
+
+docker run -it -v /home/saurav/myapp:/app mynpm init
+
+docker run -it -v /home/saurav/myapp:/app mynpm install --save express
+
+#docker-compose.yaml file for util
+
+```
+version: "3.8"
+services:
+  npm:
+    build: ./
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/app
+```
+
+docker-compose run --rm npm init
