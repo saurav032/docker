@@ -409,3 +409,63 @@ volumes:
   logs:
 
 ```
+
+# to re build docker-compose images
+
+docker-compose build
+
+docker-compose up --build
+
+# docker-compose.yaml file for non-existing image and interactive mode and custom conatiner name
+
+```
+version: "3.8"
+services:
+  mongodb:
+    image: "mongo"
+    volumes:
+      - data:/data/db
+    container_name: mongodb
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: saurav
+    #   MONGO_INITDB_ROOT_PASSWORD: secret
+
+        # - MONGO_INITDB_ROOT_USERNAME=saurav
+    env_file:
+      - ./env/mongo.env
+    # networks:
+    #  - my-network
+
+  backend:
+    build: ./backend
+    # build
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    #   args:
+    #     some-arg: 1
+    ports:
+      - '80:80'
+    volumes:
+      - logs:/applogs
+      - ./backend:/app
+      - /app/node_modules
+    env-file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    stadin_open: true
+    tty: true
+    depends_on
+      - backend
+
+volumes:
+  data:
+  logs:
+
+```
