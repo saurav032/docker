@@ -274,7 +274,7 @@ docker run -p 8000:3000 -d --rm image_name
 
     docker run -v /home/saurav/app/src:/app/src  --name my-frontend-app --rm -p 3000:3000 -i myappimage
 
-# docker-composer
+# docker-compose.yaml file
 
 ```
 version: "3.8"
@@ -301,3 +301,15 @@ volumes:
   data:
 
 ```
+
+# to start docker compose
+
+    docker-compose up
+
+# to stop docker compose
+
+    docker-compose down
+
+# to stop docker compose and remove volumes
+
+    docker-compose down -v
