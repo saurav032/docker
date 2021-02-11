@@ -273,3 +273,31 @@ docker run -p 8000:3000 -d --rm image_name
 # to start a react app in dev mode with live source code update
 
     docker run -v /home/saurav/app/src:/app/src  --name my-frontend-app --rm -p 3000:3000 -i myappimage
+
+# docker-composer
+
+```
+version: "3.8"
+services:
+  mongodb:
+    image: "mongo"
+    volumes:
+      - data:/data/db
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: saurav
+    #   MONGO_INITDB_ROOT_PASSWORD: secret
+
+        # - MONGO_INITDB_ROOT_USERNAME=saurav
+    env_file:
+      - ./env/mongo.env
+    # networks:
+    #  - my-network
+
+  backend:
+
+  frontend:
+
+volumes:
+  data:
+
+```
