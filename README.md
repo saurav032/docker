@@ -412,9 +412,9 @@ volumes:
 
 # to re build docker-compose images
 
-docker-compose build
+    docker-compose build
 
-docker-compose up --build
+    docker-compose up --build
 
 # docker-compose.yaml file for non-existing image and interactive mode and custom conatiner name
 
@@ -472,11 +472,11 @@ volumes:
 
 # docker util
 
-docker run -it -d node
+    docker run -it -d node
 
-docker exec -it conatiner_name npm init
+    docker exec -it conatiner_name npm init
 
-docker run -it node npm init
+    docker run -it node npm init
 
 # util image
 
@@ -501,9 +501,9 @@ ENTRYPOINT ["npm"]
 
 ```
 
-docker run -it -v /home/saurav/myapp:/app mynpm init
+    docker run -it -v /home/saurav/myapp:/app mynpm init
 
-docker run -it -v /home/saurav/myapp:/app mynpm install --save express
+    docker run -it -v /home/saurav/myapp:/app mynpm install --save express
 
 # docker-compose.yaml file for util
 
@@ -518,7 +518,7 @@ services:
       - ./:/app
 ```
 
-docker-compose run --rm npm init
+    docker-compose run --rm npm init
 
 # docker-compose.yaml file for nginx
 
@@ -665,7 +665,7 @@ ENTRYPOINT [ "composer", "--ignore-platform-reqs" ]
 
 # start laravel app
 
-docker-compose up -d --build server mysql php
+    docker-compose up -d --build server mysql php
 
 # nginx docker file
 
