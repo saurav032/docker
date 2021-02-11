@@ -231,3 +231,27 @@ docker run -p 8000:3000 -d --rm image_name
     =======================
 
     docker build -t myimage:latest --build-arg DEFAULT_PORT=5000
+
+# to connect to host database
+
+    mongodb://host.docker.internal:27017/mydb
+
+# to craete a network
+
+    docker network create mynetwork
+
+# network listing
+
+    docker network ls
+
+# to run mongodb in a container
+
+    docker run -d --name mongodb --netowrk mynetwork mongo
+
+# to connect to container database
+
+    mongodb://mongodb:27017/mydb
+
+# to run docker image in a network
+
+    docker run --name myapp --network mynetwork -d --rm -p 8000:3000 myimage
