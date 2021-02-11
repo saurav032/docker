@@ -269,3 +269,7 @@ docker run -p 8000:3000 -d --rm image_name
     docker run --name mongodb -v data:/data/db --rm -d --network mynetwork --env MONGO_ININTBD_ROOT_USERNAME=saurav --env MONGO_INITDB_ROOT_PASSWORD=secret mongo
 
     "momgodb://saurav:secret@mongodb:27017/mydb?authSource=admin"
+
+# to start a react app in dev mode with live source code update
+
+    docker run -v /home/saurav/app/src:/app/src  --name my-frontend-app --rm -p 3000:3000 -i myappimage
